@@ -3,8 +3,6 @@ package TestDriven;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.lang.System.exit;
-
 /**
  * Hello world!
  *
@@ -23,7 +21,7 @@ public class TestDriven
         ArrayList<ArrayList<Integer>> rangeGroups = splitIntoRanges(sortedValues);
         HashMap rangeCounts = getRangeCounts(rangeGroups);
         String masterOutout = convertToString(rangeCounts);
-        
+
         return masterOutout;
     }
 
@@ -42,8 +40,8 @@ public class TestDriven
 
         for( int i=0; i<values.length; i++) {
 
-            if (values[i] <= TwelveBSensor.SENSOR12BIT.getMaxValue()) {
-                convertedValues.add(Math.round(maxAmps * values[i] / TwelveBSensor.SENSOR12BIT.getMaxValue()));
+            if (values[i] <= BitSensor.SENSOR12BIT.getMaxValue()) {
+                convertedValues.add(Math.round(maxAmps * values[i] / BitSensor.SENSOR12BIT.getMaxValue()));
             }
         }
         return convertedValues.stream().mapToInt(i -> i).toArray();
@@ -56,9 +54,9 @@ public class TestDriven
 
         for( int i=0; i<values.length; i++) {
 
-            if (values[i] <= TenBSensor.SENSOR10BIT.getMaxValue()) {
+            if (values[i] <= BitSensor.SENSOR10BIT.getMaxValue()) {
                 int deviationValue = Math.abs(values[i] - 511);
-                convertedValues.add(Math.round(maxAmps * deviationValue / (TenBSensor.SENSOR10BIT.getMaxValue() - neutralPoint)));
+                convertedValues.add(Math.round(maxAmps * deviationValue / (BitSensor.SENSOR10BIT.getMaxValue() - neutralPoint)));
             }
         }
         return convertedValues.stream().mapToInt(i -> i).toArray();
