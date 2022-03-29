@@ -1,5 +1,7 @@
 package TestDriven;
 
+import static TestDriven.TestDriven.SENSOR10BIT;
+import static TestDriven.TestDriven.SENSOR12BIT;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -12,37 +14,26 @@ public class TestDrivenTest
     /**
      * Rigorous Test :-)
      */
-    public void testRangeValues(int[] inputValues, String expectedOutput)
+    public void testRangeValues(int[] inputValues, String expectedOutput, String sensortType)
     {
         //System.out.println(expectedOutput);
-        assertTrue(TestDriven.getRange(inputValues).equals(expectedOutput));
+        assertTrue(TestDriven.getRange(inputValues, sensortType).equals(expectedOutput));
     }
 
     @Test
     public void passInputsToTest(){
-        int[] inputValues1 = new int[]{1,3, 3, 1, 5, 4, 10, 11, 12, 12, 4, 17};
-        String expectedOutput1 = "10-12, 4\n" + "3-5, 5";
-        testRangeValues(inputValues1, expectedOutput1);
 
-        int[] inputValues2 = new int[]{1,3, 3, 1, 5, 4, 10, 11, 12, 12, 4, 17, 18};
-        String expectedOutput2 = "17-18, 2\n" + "10-12, 4\n" + "3-5, 5";
-        testRangeValues(inputValues2, expectedOutput2);
+        testRangeValues(new int[]{4094, 4095}, "10-10, 1", SENSOR12BIT);
+        testRangeValues(new int[]{4095, 4096, 5000, 5000}, "", SENSOR12BIT);
+        testRangeValues(new int[]{0}, "0-0, 1", SENSOR12BIT);
+        testRangeValues(new int[]{0, 0, 0, 0}, "0-0, 4", SENSOR12BIT);
+        testRangeValues(new int[]{0, 1, 2, 4, 5, 4000, 4001, 4002, 4094}, "0-0, 5\n10-10, 4", SENSOR12BIT);
 
-        int[] inputValues3 = new int[]{1};
-        String expectedOutput3 = "";
-        testRangeValues(inputValues3, expectedOutput3);
 
-        int[] inputValues4 = new int[]{1,1,1,1,1,1};
-        String expectedOutput4 = "";
-        testRangeValues(inputValues4, expectedOutput4);
+        testRangeValues(new int[]{0,100,150,300,500,70,1500,700,600,2000,1022}, "0-0, 1\n3-3, 1\n6-6, 2\n11-13, 3\n15-15, 2", SENSOR10BIT);
+        testRangeValues(new int[]{0}, "15-15, 1", SENSOR10BIT);
+        testRangeValues(new int[]{511}, "0-0, 1", SENSOR10BIT);
+        testRangeValues(new int[]{1022}, "15-15, 1", SENSOR10BIT);
 
-        int[] inputValues5 = new int[]{1, 2, 3, 4, 5, 6, 8, 200, 201, 222, 14, 15, 19};
-        String expectedOutput5 = "200-201, 2\n" + "14-15, 2\n" + "1-6, 6";
-
-        testRangeValues(inputValues5, expectedOutput5);
-
-        int[] inputValues6 = new int[]{};
-        String expectedOutput6 = "";
-        testRangeValues(inputValues6, expectedOutput6);
     }
 }

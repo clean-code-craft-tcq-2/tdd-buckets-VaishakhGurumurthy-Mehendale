@@ -3,21 +3,65 @@ package TestDriven;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.System.exit;
+
 /**
  * Hello world!
  *
  */
 public class TestDriven
 {
-    public static String getRange( int[] values )
+
+    public static final String SENSOR12BIT = "12BIT";
+    public static final String SENSOR10BIT = "10BIT";
+
+
+    public static String getRange( int[] values, String sensorBit )
     {
-        int[] sortedValues = Arrays.stream(values).sorted().toArray();
+        int[] convertedValues = convertToAmps(values, sensorBit);
+        int[] sortedValues = Arrays.stream(convertedValues).sorted().toArray();
         ArrayList<ArrayList<Integer>> rangeGroups = splitIntoRanges(sortedValues);
-        rangeGroups = removeDuplicates(rangeGroups);
         HashMap rangeCounts = getRangeCounts(rangeGroups);
         String masterOutout = convertToString(rangeCounts);
-
+        
         return masterOutout;
+    }
+
+    public static int[] convertToAmps(int[] values, String sensorType){
+
+        if( sensorType.equals(SENSOR12BIT) )
+            return TwelveBitConverter(values);
+        else
+            return TenBitConverter(values) ;
+    }
+
+    public static int[] TwelveBitConverter(int[] values){
+        ArrayList<Integer> convertedValues = new ArrayList<>();
+        float maxAmps = 10;
+
+
+        for( int i=0; i<values.length; i++) {
+
+            if (values[i] <= TwelveBSensor.SENSOR12BIT.getMaxValue()) {
+                convertedValues.add(Math.round(maxAmps * values[i] / TwelveBSensor.SENSOR12BIT.getMaxValue()));
+            }
+        }
+        return convertedValues.stream().mapToInt(i -> i).toArray();
+    }
+
+    public static int[] TenBitConverter(int[] values){
+        ArrayList<Integer> convertedValues = new ArrayList<>();
+        float maxAmps = 15;
+        int neutralPoint = 511;
+
+        for( int i=0; i<values.length; i++) {
+
+            if (values[i] <= TenBSensor.SENSOR10BIT.getMaxValue()) {
+                int deviationValue = Math.abs(values[i] - 511);
+                convertedValues.add(Math.round(maxAmps * deviationValue / (TenBSensor.SENSOR10BIT.getMaxValue() - neutralPoint)));
+            }
+        }
+        return convertedValues.stream().mapToInt(i -> i).toArray();
     }
 
     public static ArrayList<ArrayList<Integer>> splitIntoRanges(int[] values){
@@ -40,11 +84,13 @@ public class TestDriven
 
         }
 
+
         return rangeSet;
 
     }
 
 
+/*
     public static ArrayList<ArrayList<Integer>> removeDuplicates(ArrayList<ArrayList<Integer>> rangeGroups){
 
         ArrayList<ArrayList<Integer>> newRangeGroup = new ArrayList<>();
@@ -55,10 +101,11 @@ public class TestDriven
         return newRangeGroup;
 
     }
+*/
 
     public static HashMap<String, String> getRangeCounts(ArrayList<ArrayList<Integer>> rangeGroups){
 
-        HashMap<String, String> rangeCounts = new HashMap<>();
+        HashMap<String, String> rangeCounts = new LinkedHashMap<>();
 
         for(ArrayList<Integer> range : rangeGroups){
             String rangeString = range.get(0) + "-" + range.get(range.size()-1);
